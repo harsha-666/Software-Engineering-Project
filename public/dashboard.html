@@ -1,0 +1,347 @@
+<!-- START OF dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Notes Sharing Portal</title>
+  <style>
+    /* -- Your original CSS untouched -- */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    .main-container {
+      flex: 3;
+      padding: 20px;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #222;
+      color: white;
+      padding: 15px 20px;
+    }
+
+    .navbar .logo {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .card {
+      width: 250px;
+      height: 140px;
+      background: linear-gradient(135deg, #007bff, #6610f2);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .dropdown {
+      position: relative;
+      width: 250px;
+    }
+
+    .dropdown .card {
+      background: linear-gradient(135deg, #ff8c00, #ff4500);
+    }
+
+    .dropdown-content {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: white;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      display: none;
+      flex-direction: column;
+      z-index: 10;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: flex;
+    }
+
+    .dropdown-content div {
+      padding: 12px;
+      background: #eee;
+      border-bottom: 1px solid #ddd;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .dropdown-content div:hover {
+      background: #ddd;
+    }
+
+    .subject-container {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      background: white;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .chatbot-panel {
+      flex: 1;
+      background: #f8f9fa;
+      padding: 20px;
+      border-left: 2px solid #ddd;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .chatbot-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .chatbot-select, .chatbot-file-select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+    }
+
+    .upload-btn {
+      background: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    .upload-btn:hover {
+      background: #0056b3;
+    }
+
+    .chatbox {
+      width: 100%;
+      height: 200px;
+      overflow-y: scroll;
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .chatbox p {
+      margin: 5px 0;
+    }
+
+    .chat-input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+
+    .note-list {
+      margin-top: 15px;
+    }
+
+    .note-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f2f2f2;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .note-item button {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-container">
+    <div class="navbar">
+      <div class="logo">📚 Notes Sharing Portal</div>
+    </div>
+
+    <div class="container">
+      <div class="card" onclick="openSubject('Software Engineering', '19CSE314', 3)">Software Engineering</div>
+      <div class="card" onclick="openSubject('Principles of Programming Language', '19CSE313', 3)">Principles of Programming<br>Language</div>
+      <div class="card" onclick="openSubject('Distributed Systems', '19CSE312', 4)">Distributed Systems</div>
+      <div class="card" onclick="openSubject('Computer Security', '19CSE311', 3)">Computer Security</div>
+
+      <div class="dropdown">
+        <div class="card">Professional Elective 2</div>
+        <div class="dropdown-content">
+          <div onclick="openSubject('Ethical Hacking', '19CSE335', 3)">Ethical Hacking</div>
+          <div onclick="openSubject('Deep Learning for Computer Vision', '19CSE437', 3)">Deep Learning for Computer Vision</div>
+          <div onclick="openSubject('Cloud Computing', '19CSE445', 3)">Cloud Computing</div>
+        </div>
+      </div>
+
+      <div class="dropdown">
+        <div class="card">Professional Elective 3</div>
+        <div class="dropdown-content">
+          <div onclick="openSubject('Mobile and Wireless Security', '19CSE338', 3)">Mobile and Wireless Security</div>
+          <div onclick="openSubject('Internet of Things', '19CSE446', 3)">Internet of Things</div>
+          <div onclick="openSubject('Neural Networks and Deep Learning', '19CSE456', 3)">Neural Networks and Deep Learning</div>
+          <div onclick="openSubject('Time Series Analysis', '22AIE463', 3)">Time Series Analysis</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="subject-container" class="subject-container">
+      <h2 id="subject-title"></h2>
+      <p><strong>Course Code:</strong> <span id="course-code"></span></p>
+      <p><strong>Credits:</strong> <span id="course-credits"></span></p>
+
+      <div id="upload-area" style="display:none;">
+        <input type="file" id="note-file" />
+        <button onclick="uploadNote()">Upload</button>
+      </div>
+
+      <h3>Available Notes</h3>
+      <div class="note-list" id="note-list"></div>
+    </div>
+  </div>
+
+  <div class="chatbot-panel">
+    <div class="chatbot-title">💬 Chatbot - Summarize Notes</div>
+    <div class="chatbox" id="chatbox">
+      <p><strong>Bot:</strong> Hello! I'm here to help summarize your notes.</p>
+    </div>
+    <input type="text" id="user-input" class="chat-input" placeholder="Ask me something...">
+    <button class="upload-btn" onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    let currentSubject = "";
+
+    function openSubject(subjectName, courseCode, credits) {
+      currentSubject = subjectName;
+      document.getElementById('subject-title').innerText = subjectName;
+      document.getElementById('course-code').innerText = courseCode;
+      document.getElementById('course-credits').innerText = credits;
+      document.getElementById('subject-container').style.display = 'block';
+
+      const role = localStorage.getItem("role");
+      document.getElementById("upload-area").style.display = (role === "teacher") ? "block" : "none";
+
+      loadNotes(subjectName);
+    }
+
+    function loadNotes(subject) {
+      fetch(`/notes/${subject}`)
+        .then(res => res.json())
+        .then(files => {
+          const list = document.getElementById('note-list');
+          list.innerHTML = '';
+          const role = localStorage.getItem("role");
+
+          files.forEach(file => {
+            const item = document.createElement('div');
+            item.className = 'note-item';
+            const filename = file.split("/").pop();
+            item.innerHTML = `
+              <span>${filename}</span>
+              <div>
+                <a href="/uploads/${file}" download><button>Download</button></a>
+                ${role === 'teacher' ? `<button onclick="deleteNote('${filename}', '${subject}')">Delete</button>` : ''}
+              </div>
+            `;
+            list.appendChild(item);
+          });
+        });
+    }
+
+    function uploadNote() {
+      const file = document.getElementById('note-file').files[0];
+      if (!file || !currentSubject) return;
+
+      const formData = new FormData();
+      formData.append('note', file);
+      formData.append('subject', currentSubject);
+
+      fetch('/upload', { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(() => {
+          alert("Upload successful");
+          loadNotes(currentSubject);
+        });
+    }
+
+    function deleteNote(filename, subject) {
+      fetch(`/notes/${subject}/${filename}`, { method: 'DELETE' })
+        .then(res => res.json())
+        .then(() => {
+          alert("Note deleted");
+          loadNotes(subject);
+        });
+    }
+
+    function sendMessage() {
+      const chatbox = document.getElementById("chatbox");
+      const userInput = document.getElementById("user-input").value;
+
+      if (userInput.trim() === "") return;
+
+      chatbox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+      chatbox.scrollTop = chatbox.scrollHeight;
+
+      fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userInput })
+      })
+      .then(res => res.json())
+      .then(data => {
+        chatbox.innerHTML += `<p><strong>Bot:</strong> ${data.response}</p>`;
+        chatbox.scrollTop = chatbox.scrollHeight;
+        document.getElementById("user-input").value = "";
+      })
+      .catch(err => {
+        chatbox.innerHTML += `<p><strong>Bot:</strong> Sorry, something went wrong.</p>`;
+        console.error("Chat error:", err);
+      });
+    }
+  </script>
+
+</body>
+</html>
+<!-- END OF dashboard.html -->
