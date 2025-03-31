@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Notes Sharing Portal</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #f4f4f9;
+      --bg-secondary: #ffffff;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --accent-primary: #007bff;
+      --accent-secondary: #6610f2;
+      --card-gradient-1: linear-gradient(135deg, #007bff, #6610f2);
+      --card-gradient-2: linear-gradient(135deg, #ff8c00, #ff4500);
+      --navbar-bg: #222;
+      --navbar-text: #ffffff;
+      --border-color: #ddd;
+      --shadow-color: rgba(0, 0, 0, 0.1);
+      --hover-color: #eee;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #121212;
+      --bg-secondary: #1e1e1e;
+      --text-primary: #f0f0f0;
+      --text-secondary: #aaaaaa;
+      --accent-primary: #3498db;
+      --accent-secondary: #9b59b6;
+      --card-gradient-1: linear-gradient(135deg, #3498db, #9b59b6);
+      --card-gradient-2: linear-gradient(135deg, #e67e22, #d35400);
+      --navbar-bg: #0a0a0a;
+      --navbar-text: #ffffff;
+      --border-color: #333;
+      --shadow-color: rgba(0, 0, 0, 0.2);
+      --hover-color: #2a2a2a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .main-container {
+      flex: 3;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .content-area {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--navbar-bg);
+      color: var(--navbar-text);
+      padding: 15px 20px;
+      box-shadow: 0 2px 10px var(--shadow-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .navbar-content {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .navbar .logo {
+      font-size: 22px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo i {
+      font-size: 24px;
+      color: var(--accent-primary);
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--navbar-text);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      transition: background-color 0.3s;
+    }
+
+    .theme-toggle:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 20px 0;
+    }
+
+    .card {
+      height: 140px;
+      background: var(--card-gradient-1);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0px 4px 12px var(--shadow-color);
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(-100%);
+      transition: transform 0.5s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card:hover::before {
+      transform: translateX(0);
+    }
+
+    .card-icon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 24px;
+      opacity: 0.7;
+    }
+
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown .card {
+      background: var(--card-gradient-2);
+    }
+
+    .dropdown-content {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-secondary);
+      box-shadow: 0px 4px 12px var(--shadow-color);
+      border-radius: 10px;
+      display: none;
+      flex-direction: column;
+      z-index: 10;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: flex;
+    }
+
+    .dropdown-content div {
+      padding: 12px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: 0.3s;
+      color: var(--text-primary);
+    }
+
+    .dropdown-content div:hover {
+      background: var(--hover-color);
+    }
+
+    .subject-container {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      background: var(--bg-secondary);
+      box-shadow: 0px 4px 12px var(--shadow-color);
+      border-radius: 10px;
+      max-width: 800px;
+      margin: 20px auto;
+    }
+
+    .subject-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .subject-meta {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .meta-item i {
+      color: var(--accent-primary);
+    }
+
+    .upload-area {
+      background: var(--bg-secondary);
+      border: 2px dashed var(--border-color);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .upload-area:hover {
+      border-color: var(--accent-primary);
+    }
+
+    .upload-area i {
+      font-size: 32px;
+      color: var(--accent-primary);
+      margin-bottom: 10px;
+    }
+
+    .upload-btn {
+      background: var(--accent-primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .upload-btn:hover {
+      background: var(--accent-secondary);
+    }
+
+    .file-input {
+      opacity: 0;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .note-list {
+      margin-top: 20px;
+    }
+
+    .note-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-primary);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      transition: 0.3s;
+    }
+
+    .note-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px var(--shadow-color);
+    }
+
+    .note-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .note-icon {
+      font-size: 24px;
+      color: var(--accent-primary);
+    }
+
+    .note-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .note-btn {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .note-btn:hover {
+      background: var(--accent-primary);
+      color: white;
+      border-color: var(--accent-primary);
+    }
+
+    .note-btn i {
+      font-size: 14px;
+    }
+
+    .chatbot-panel {
+      flex: 1;
+      background: var(--bg-secondary);
+      border-left: 2px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      min-width: 300px;
+      max-width: 350px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+    }
+
+    .chatbot-header {
+      background: var(--accent-primary);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .chatbox {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message {
+      max-width: 85%;
+      padding: 10px 15px;
+      border-radius: 18px;
+      margin-bottom: 5px;
+      word-wrap: break-word;
+    }
+
+    .bot-message {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border-top-left-radius: 5px;
+      align-self: flex-start;
+    }
+
+    .user-message {
+      background: var(--accent-primary);
+      color: white;
+      border-top-right-radius: 5px;
+      align-self: flex-end;
+    }
+
+    .chat-input-container {
+      display: flex;
+      padding: 15px;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .chat-input:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .send-btn {
+      background: var(--accent-primary);
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .send-btn:hover {
+      background: var(--accent-secondary);
+    }
+
+    .toggle-chatbot {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--accent-primary);
+      color: white;
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 8px var(--shadow-color);
+      z-index: 1000;
+      font-size: 24px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      
+      .main-container {
+        width: 100%;
+      }
+      
+      .chatbot-panel {
+        position: fixed;
+        right: -350px;
+        top: 0;
+        bottom: 0;
+        z-index: 1000;
+        transition: right 0.3s;
+      }
+      
+      .chatbot-panel.open {
+        right: 0;
+      }
+      
+      .toggle-chatbot {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <div class="navbar">
+      <div class="navbar-content">
+        <div class="logo">
+          <i class="fas fa-book"></i>
+          Notes Sharing Portal
+        </div>
+      </div>
+      <div class="navbar-content">
+        <button id="theme-toggle" class="theme-toggle">
+          <i class="fas fa-moon"></i>
+        </button>
+        <div class="user-info">
+          <div class="user-avatar">
+            U
+          </div>
+          <span id="user-role">Student</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <div class="container">
+        <div class="card" onclick="openSubject('Software Engineering', '19CSE314', 3)">
+          <i class="fas fa-code card-icon"></i>
+          Software Engineering
+        </div>
+        <div class="card" onclick="openSubject('Principles of Programming Language', '19CSE313', 3)">
+          <i class="fas fa-laptop-code card-icon"></i>
+          Principles of Programming Language
+        </div>
+        <div class="card" onclick="openSubject('Distributed Systems', '19CSE312', 4)">
+          <i class="fas fa-network-wired card-icon"></i>
+          Distributed Systems
+        </div>
+        <div class="card" onclick="openSubject('Computer Security', '19CSE311', 3)">
+          <i class="fas fa-shield-alt card-icon"></i>
+          Computer Security
+        </div>
+
+        <div class="dropdown">
+          <div class="card">
+            <i class="fas fa-puzzle-piece card-icon"></i>
+            Professional Elective 2
+          </div>
+          <div class="dropdown-content">
+            <div onclick="openSubject('Ethical Hacking', '19CSE335', 3)">
+              <i class="fas fa-user-secret"></i> Ethical Hacking
+            </div>
+            <div onclick="openSubject('Deep Learning for Computer Vision', '19CSE437', 3)">
+              <i class="fas fa-eye"></i> Deep Learning for Computer Vision
+            </div>
+            <div onclick="openSubject('Cloud Computing', '19CSE445', 3)">
+              <i class="fas fa-cloud"></i> Cloud Computing
+            </div>
+          </div>
+        </div>
+
+        <div class="dropdown">
+          <div class="card">
+            <i class="fas fa-puzzle-piece card-icon"></i>
+            Professional Elective 3
+          </div>
+          <div class="dropdown-content">
+            <div onclick="openSubject('Mobile and Wireless Security', '19CSE338', 3)">
+              <i class="fas fa-mobile-alt"></i> Mobile and Wireless Security
+            </div>
+            <div onclick="openSubject('Internet of Things', '19CSE446', 3)">
+              <i class="fas fa-microchip"></i> Internet of Things
+            </div>
+            <div onclick="openSubject('Neural Networks and Deep Learning', '19CSE456', 3)">
+              <i class="fas fa-brain"></i> Neural Networks and Deep Learning
+            </div>
+            <div onclick="openSubject('Time Series Analysis', '22AIE463', 3)">
+              <i class="fas fa-chart-line"></i> Time Series Analysis
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="subject-container" class="subject-container">
+        <div class="subject-header">
+          <h2 id="subject-title"></h2>
+          <button class="note-btn" id="back-btn" onclick="closeSubject()">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+        </div>
+        
+        <div class="subject-meta">
+          <div class="meta-item">
+            <i class="fas fa-bookmark"></i>
+            <span id="course-code"></span>
+          </div>
+          <div class="meta-item">
+            <i class="fas fa-star"></i>
+            <span id="course-credits"></span> Credits
+          </div>
+        </div>
+
+        <div id="upload-area" class="upload-area" style="display:none;">
+          <div class="file-input-container">
+            <input type="file" id="note-file" class="file-input" />
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h3>Upload Notes</h3>
+            <p>Drag & drop files here or click to browse</p>
+            <button class="upload-btn" onclick="uploadNote()">
+              <i class="fas fa-upload"></i> Upload
+            </button>
+          </div>
+        </div>
+
+        <h3><i class="fas fa-list-ul"></i> Available Notes</h3>
+        <div class="note-list" id="note-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chatbot-panel" id="chatbot-panel">
+    <div class="chatbot-header">
+      <i class="fas fa-robot"></i> Notes Assistant
+    </div>
+    <div class="chatbox" id="chatbox">
+      <div class="message bot-message">
+        Hello! I'm here to help summarize your notes. What would you like to know?
+      </div>
+    </div>
+    <div class="chat-input-container">
+      <input type="text" id="user-input" class="chat-input" placeholder="Ask me something...">
+      <button class="send-btn" onclick="sendMessage()">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <button class="toggle-chatbot" id="toggle-chatbot">
+    <i class="fas fa-comment"></i>
+  </button>
+
+  <script>
+    let currentSubject = "";
+    
+    // Set initial theme from local storage or default to light
+    document.documentElement.setAttribute('data-theme', 
+      localStorage.getItem('theme') || 'light');
+    
+    // Update theme toggle icon
+    updateThemeIcon();
+    
+    // Simulate user role (from localStorage)
+    document.getElementById('user-role').innerText = 
+      localStorage.getItem('role') || 'Student';
+    
+    // Theme toggle functionality
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon();
+    });
+    
+    function updateThemeIcon() {
+      const themeToggle = document.getElementById('theme-toggle');
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      
+      if (currentTheme === 'dark') {
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+      } else {
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+      }
+    }
+
+    function openSubject(subjectName, courseCode, credits) {
+      currentSubject = subjectName;
+      document.getElementById('subject-title').innerText = subjectName;
+      document.getElementById('course-code').innerText = courseCode;
+      document.getElementById('course-credits').innerText = credits;
+      document.getElementById('subject-container').style.display = 'block';
+
+      const role = localStorage.getItem("role") || "student";
+      document.getElementById("upload-area").style.display = (role === "teacher") ? "block" : "none";
+
+      // Scroll to subject container
+      document.getElementById('subject-container').scrollIntoView({ behavior: 'smooth' });
+      
+      // Simulate loading notes
+      loadNotes(subjectName);
+    }
+    
+    function closeSubject() {
+      document.getElementById('subject-container').style.display = 'none';
+    }
+
+    function loadNotes(subject) {
+      // Simulated notes data - in a real app this would be fetched from the server
+      const mockNotes = [
+        { name: "Lecture 1 - Introduction.pdf", date: "2023-03-01" },
+        { name: "Lecture 2 - Core Concepts.pdf", date: "2023-03-08" },
+        { name: "Assignment 1.pdf", date: "2023-03-15" }
+      ];
+      
+      const list = document.getElementById('note-list');
+      list.innerHTML = '';
+      const role = localStorage.getItem("role") || "student";
+
+      mockNotes.forEach(note => {
+        const item = document.createElement('div');
+        item.className = 'note-item';
+        
+        const extension = note.name.split('.').pop().toLowerCase();
+        let iconClass = 'fas fa-file';
+        
+        if (extension === 'pdf') {
+          iconClass = 'fas fa-file-pdf';
+        } else if (['doc', 'docx'].includes(extension)) {
+          iconClass = 'fas fa-file-word';
+        } else if (['ppt', 'pptx'].includes(extension)) {
+          iconClass = 'fas fa-file-powerpoint';
+        }
+        
+        item.innerHTML = `
+          <div class="note-info">
+            <i class="${iconClass} note-icon"></i>
+            <div>
+              <div>${note.name}</div>
+              <small>Added: ${note.date}</small>
+            </div>
+          </div>
+          <div class="note-actions">
+            <button class="note-btn">
+              <i class="fas fa-download"></i> Download
+            </button>
+            ${role === 'teacher' ? `
+              <button class="note-btn" onclick="deleteNote('${note.name}', '${subject}')">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            ` : ''}
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function uploadNote() {
+      const file = document.getElementById('note-file').files[0];
+      if (!file || !currentSubject) return;
+
+      // Simulated upload - in a real app this would send to the server
+      alert(`File ${file.name} uploaded successfully to ${currentSubject}`);
+      loadNotes(currentSubject);
+    }
+
+    function deleteNote(filename, subject) {
+      // Simulated delete - in a real app this would send to the server
+      alert(`Note ${filename} deleted from ${subject}`);
+      loadNotes(subject);
+    }
+
+    function sendMessage() {
+      const chatbox = document.getElementById("chatbox");
+      const userInput = document.getElementById("user-input").value;
+
+      if (userInput.trim() === "") return;
+
+      // Add user message
+      const userMessage = document.createElement('div');
+      userMessage.className = 'message user-message';
+      userMessage.textContent = userInput;
+      chatbox.appendChild(userMessage);
+      
+      // Clear input
+      document.getElementById("user-input").value = "";
+      
+      // Scroll to bottom
+      chatbox.scrollTop = chatbox.scrollHeight;
+      
+      // Simulate response (in a real app this would be an API call)
+      setTimeout(() => {
+        const botMessage = document.createElement('div');
+        botMessage.className = 'message bot-message';
+        
+        // Simple responses based on keywords
+        if (userInput.toLowerCase().includes('summary')) {
+          botMessage.textContent = "I can provide summaries of your notes. Just let me know which lecture you'd like summarized!";
+        } else if (userInput.toLowerCase().includes('help')) {
+          botMessage.textContent = "I can help summarize notes, answer questions about course content, and provide study tips. What would you like assistance with?";
+        } else {
+          botMessage.textContent = "I'm here to help with your notes! You can ask me to summarize content, explain concepts, or provide study recommendations.";
+        }
+        
+        chatbox.appendChild(botMessage);
+        chatbox.scrollTop = chatbox.scrollHeight;
+      }, 600);
+    }
+    
+    // Mobile chatbot toggle
+    document.getElementById('toggle-chatbot').addEventListener('click', () => {
+      const chatbotPanel = document.getElementById('chatbot-panel');
+      chatbotPanel.classList.toggle('open');
+    });
+    
+    // Add event listener for enter key in chat input
+    document.getElementById('user-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>
